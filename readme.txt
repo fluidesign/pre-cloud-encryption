@@ -1,10 +1,13 @@
-Script Name: GoodSync-Encrypt-Decrypt.bat
-Author: Raul Cano Argamasilla
-Email: raul.cano.argamasilla@gmail.com
-Date: 14.10.2013
+##########################################################
+Forked from:
+	https://github.com/raulcano/goodsync-encryption
+	Script Name: GoodSync-Encrypt-Decrypt.bat
+	Author: Raul Cano Argamasilla
+	Email: raul.cano.argamasilla@gmail.com
+	Date: 14.10.2013
+##########################################################
 
 Requirements:
-  GoodSync (Windows version)
   AxCrypt (Windows version)
 	 
 Description: 
