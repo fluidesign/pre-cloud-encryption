@@ -1,8 +1,6 @@
 ####################################################
 # Imports
 ####################################################
-import keyring
-import getpass
 import os
 import sys
 import argparse
@@ -24,6 +22,29 @@ DESTINATION_PATH = ''
 MIN_OF_ARGS_PROVIDED = 1
 
 ####################################################
+# Class
+####################################################
+
+
+class AxcryotSoftware(object):
+    @staticmethod
+    def axcrypt_exe_path():
+        return AXCRYPT_EXE
+
+    @staticmethod
+    def axcrypt_extenstion():
+        return AXCRYPT_EXTENSION
+
+
+class MessageHandler(object):
+    @staticmethod
+    def print_to_cli(message):
+        try:
+            print(message)
+        except TypeError as error:
+            print("Exception found in {f}, error:{e}".format(f=__name__, e=error))
+
+####################################################
 # Functions
 ####################################################
 
@@ -41,7 +62,7 @@ def validate_supported_os():
 
 def validate_axcrytp_installed():
     if not os.path.isfile(AXCRYPT_EXE):
-        print("Cannot find Axcrypt installtion folder or executable : {ex}".format(ex=AXCRYPT_EXE))
+        print("Cannot find Axcrypt install folder or executable : {ex}".format(ex=AXCRYPT_EXE))
 
 
 def valid_path(path):
@@ -52,65 +73,27 @@ def valid_path(path):
         return path
 
 
-def get_encrpytion_password():
-    return keyring.get_password(KEYRING_SERVICE_NAME, KEYRING_USER_NAME)
-
-
-def is_encryption_password_in_memory():
-        if get_encrpytion_password() is not None:
-            return True
-        else:
-            return False
-
-
-def set_encrpytion_password_cli():
-    keyring.set_password(KEYRING_SERVICE_NAME, KEYRING_USER_NAME, getpass.win_getpass("Please type the password:"))
-
-
-def clean_encrpytion_password():
-    try:
-        if is_encryption_password_in_memory() is True:
-            keyring.delete_password(KEYRING_SERVICE_NAME, KEYRING_USER_NAME)
-    except keyring.errors.PasswordDeleteError:
-         print ("Unable to clean encryption password")
-
-
-def set_encrpytion_password(password):
-    keyring.set_password(KEYRING_SERVICE_NAME, KEYRING_USER_NAME, password)
-
-
-def handle_encryption_password():
-    ENCRYPTION_PASSWORD = get_encrpytion_password()
-    if ENCRYPTION_PASSWORD is None:
-        print("It seems like no password is configured for user '{usr}', lets configure it first"
-              .format(usr=KEYRING_USER_NAME))
-        set_encrpytion_password()
-    return ENCRYPTION_PASSWORD
-
-
 def validate_number_of_args(args):
     global MIN_OF_ARGS_PROVIDED
 
-    if (len(args)> MIN_OF_ARGS_PROVIDED):
-        return True;
+    if len(args) > MIN_OF_ARGS_PROVIDED:
+        return True
     else:
-        exit (1)
+        MessageHandler.print_to_cli("Wrong number of arguments, should be at least: {n}".
+                                    format(n=MIN_OF_ARGS_PROVIDED))
+        exit(1)
 
 
 def get_full_list_of_files_in_path(path):
-    file_paths = []  # List which will store all of the full filepaths.
-
+    file_paths = []  # List which will store all of the full file path.
+    files_to_ignore = ['Thumbs.db', 'desktop.ini', '.dropbox', 'DS_Store']
     # Walk the tree.
     for root, directories, files in os.walk(path):
         for filename in files:
-            # Join the two strings in order to form the full filepath.
-            file_path = os.path.join(root, filename)
-            if ((os.path.splitext(filename)[1]) == AXCRYPT_EXTENSION):
-                # reverse the file, replace - with . and revse back
-                original_file_name = os.path.splitext(filename)[0][::1].replace('-','.',1)[::1]
-            else:
-                original_file_name = filename
-            file_paths.append([file_path,filename,original_file_name])  # Add it to the list.
+            # Join the two strings in order to form the full file path.
+            if filename not in files_to_ignore:
+                file_path = os.path.join(root, filename)
+                file_paths.append(file_path)  # Add it to the list.
 
     return file_paths  # Self-explanatory.
 
